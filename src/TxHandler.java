@@ -1,6 +1,7 @@
 import java.security.PublicKey;
 import java.util.ArrayList;
 
+
 public class TxHandler {
 	
 	UTXOPool _pool;
@@ -78,11 +79,11 @@ public class TxHandler {
     			return false;
     		}
     		
-    		PublicKey pubKee = _pool.getTxOutput(utxo).address;
+    		PublicKey pubKey = _pool.getTxOutput(utxo).address;
     		
     		// last, run it all through Crypto.verifySignature
     		// return false if the input's signature is not valid
-    		if (!Crypto.verifySignature(pubKee, message, signature))
+    		if (!Crypto.verifySignature(pubKey, message, signature))
     			return false;    		
     	}
     	return true;
@@ -110,14 +111,28 @@ public class TxHandler {
      * UTXO pool as appropriate.
      */
     public Transaction[] handleTxs(Transaction[] possibleTxs) {
-        Transaction[] retVal = new Transaction[possibleTxs.length];
+    	// check if a transaction's input is in the pool; if so, individually valid
+    	// so add it's output to the UTXO pool
+    	// if not, set it into a "to be checked later pool"; run these through after one pass
+    	ArrayList<Transaction> accepted = new ArrayList<Transaction>();
+    	ArrayList<Transaction> waitingList = new ArrayList<Transaction>();
+    	
+    	for(Transaction transaction : possibleTxs){
+    		if(!isValidTx(transaction)){
+    			waitingList.add(transaction);
+    		}
+    		
+    		
+    	}
+    	
+    	
+       /* Transaction[] retVal = new Transaction[possibleTxs.length];
         for(int i = 0; i < retVal.length; i++){
         	if(isValidTx(possibleTxs[i])){
         		retVal[i] = possibleTxs[i];
         	}
-        }
-        // TODO: Update the UTXO pool?
-    	return retVal;
+        }*/
+    	return new Transaction[possibleTxs.length];
     }
 }
 
